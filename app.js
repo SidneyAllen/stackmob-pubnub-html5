@@ -127,7 +127,7 @@ var myApp = (function($) {
          }
 
          str = obj.title;
-         var replaced = str.split('+').join('_');
+         var replaced = str.split('+').join(' ');
          obj.title = replaced;
          this.$el.append(this.template(obj));
          i = i + 1;
