@@ -12,7 +12,6 @@ var myApp = (function($) {
       subscribe_key : 'sub-c-8b1086e2-b1dd-11e2-969e-02ee2ddab7fe'
   });
 
-
   function updateDisplay(pubData) {       
     answers = $(pubData.answers).sortAnswers();
     answersAvg = answers.setDataArray();
@@ -24,31 +23,30 @@ var myApp = (function($) {
   }
 
   function animateData(dataArray){
-      var angTot = 0,
-          angCur = 0; 
- 
-      $.each(dataArray, function(key, data) {
+    var angTot = 0,
+        angCur = 0; 
 
-          angCur = Math.round(data.value * 36) / 10;
+    $.each(dataArray, function(key, data) {
 
-          $('div.' + key + '-2').css('transform', 'rotate(' + angTot + 'deg)');
+        angCur = Math.round(data.value * 36) / 10;
 
-          // if > 50% we need a second part
-          if (data.value > 50){          
-              $('div.' + key + '-2 > div').css('transform', 'rotate(' + 180 + 'deg)');
-              angTot += 180;
-              angCur -= 180;
-              
-          } else {
-              $('div.' + key + '-2 > div').css('transform', 'rotate(0deg)');
-          }
-          
-          $('div.' + key).css('transform', 'rotate(' + angTot + 'deg)');
-          $('div.' + key + ' > div').css('transform', 'rotate(' + angCur + 'deg)');
-          angTot = Math.round((angTot + angCur) * 10) / 10;
-      });
+        $('div.' + key + '-2').css('transform', 'rotate(' + angTot + 'deg)');
+
+        // if > 50% we need a second part
+        if (data.value > 50){          
+            $('div.' + key + '-2 > div').css('transform', 'rotate(' + 180 + 'deg)');
+            angTot += 180;
+            angCur -= 180;
+            
+        } else {
+            $('div.' + key + '-2 > div').css('transform', 'rotate(0deg)');
+        }
+        
+        $('div.' + key).css('transform', 'rotate(' + angTot + 'deg)');
+        $('div.' + key + ' > div').css('transform', 'rotate(' + angCur + 'deg)');
+        angTot = Math.round((angTot + angCur) * 10) / 10;
+    });
   }
-
 
   var Question = StackMob.Model.extend({
       schemaName: 'question'
@@ -103,7 +101,7 @@ var myApp = (function($) {
     }
   });
 
-   var LegendView = Backbone.View.extend({
+  var LegendView = Backbone.View.extend({
  
     initialize: function() {
       this.model = this.options.model;
@@ -119,7 +117,6 @@ var myApp = (function($) {
         var answers = this.model.toJSON().answers;
       }
       
-      console.log(answers);
       var i = 1;
       for (var key in answers) {
          var obj = answers[key];
@@ -172,22 +169,15 @@ var myApp = (function($) {
               'background-color': data.color
         });
 
-
-        var valueOver50 = false;
-        if (data.value > 50) valueOver50 = true; 
-        
-        //if (valueOver50) {
-            console.log("over 50")
-            $graph.append(this.template2({key : key}));
-            //$graph.append('<div class="pie ' + key + '-2"></div>');
-            $holder = $graph.find('> div:last-child').append('<div></div>');
-            $pie = $graph.find('> div:last-child>div');    
-            $holder.css('transform', 'rotate(0deg)');
-            $pie.css({
-                'transform': 'rotate(0deg)',
-                'background-color': data.color
-            });
-         // }
+        $graph.append(this.template2({key : key}));
+        $holder = $graph.find('> div:last-child').append('<div></div>');
+        $pie = $graph.find('> div:last-child>div');    
+        $holder.css('transform', 'rotate(0deg)');
+        $pie.css({
+            'transform': 'rotate(0deg)',
+            'background-color': data.color
+        });
+         
       }
 
       $graph.find('> div').css('clip', 'rect(0px,' + chartWidth + 'px,' + chartHeight + 'px,' + chartWidth / 2 + 'px)');
@@ -216,7 +206,7 @@ var myApp = (function($) {
     },
 
     render: function() {
-      $(this.el).html(this.template(model.toJSON()));
+      $(this.el).html(this.template(this.model.toJSON()));
 
       var buttons = new ButtonView({model: this.model}).render().el; 
       var content = $(this.el).find("#buttons");
@@ -292,14 +282,24 @@ var myApp = (function($) {
           message : function(pubData){  updateDisplay(pubData); }
       });
 
-      model = this.collection.get(e);
-
-      this.changePage(new UpdateView({
-        collection: this.collection,
-        router: this,
-        model: model,
-        question_id : e
-      }), false);
+      question = new Question({question_id : e});
+      var q = new StackMob.Collection.Query();
+      q.setExpand(1);
+      self = this;
+      question.query(q,{
+        async: false,
+        success : function(data){
+          self.changePage(new UpdateView({
+            collection: self.collection,
+            router: this,
+            model: data,
+            question_id : e
+          }), false);
+        },
+        error : function(error) {
+          alert("Error Loading - Did you set your public key?");
+        }
+      });
     },
 
     changePage: function(page, reverse) {
@@ -324,10 +324,8 @@ var myApp = (function($) {
 
   var initialize = function() {
     questions = new Questions();
-    var q = new StackMob.Collection.Query();
-    q.setExpand(1);
 
-    questions.query(q,{
+    questions.fetch({
       async: false,
       success : function(collection){
         
@@ -341,7 +339,6 @@ var myApp = (function($) {
       collection: questions
     });
     Backbone.history.start();
-
   };
 
   return {
