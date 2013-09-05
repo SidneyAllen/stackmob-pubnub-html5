@@ -1,8 +1,30 @@
 // Initialize StackMob
-StackMob.init({
-    publicKey: "254649b7-5226-4aab-98b5-8df3157c2976",
-    apiVersion: 0
-});
+var str = window.location.href;
+var prod=str.search("http://pubnubdemo.stackmob339.stackmobapp.com");
+var dev=str.search("http://dev.pubnubdemo.stackmob339.stackmobapp.com");
+
+if(prod === 0) {
+  StackMob.init({
+      publicKey:  "0dbb843a-32bd-4942-b0aa-dedd248c13f1",
+      apiVersion: 1
+  });
+  console.log('init production');
+} else if(dev === 0) {
+  StackMob.init({
+      publicKey: "254649b7-5226-4aab-98b5-8df3157c2976",
+      apiVersion: 0
+  });
+  console.log('init dev');
+
+} else {
+
+  StackMob.init({
+      publicKey: "254649b7-5226-4aab-98b5-8df3157c2976",
+      apiVersion: 0
+  });
+}
+
+
 
 // Keep app self-contained
 var myApp = (function($) {
