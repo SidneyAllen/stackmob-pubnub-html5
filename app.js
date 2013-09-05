@@ -125,7 +125,10 @@ var myApp = (function($) {
          } else {
           obj.percent = "0";
          }
-         
+
+         str = obj.title;
+         var replaced = str.split('+').join('_');
+         obj.title = replaced;
          this.$el.append(this.template(obj));
          i = i + 1;
       }
