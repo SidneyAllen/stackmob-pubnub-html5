@@ -31,7 +31,7 @@ var myApp = (function($) {
 
   // Init
   var pubnub = PUBNUB.init({
-      subscribe_key : 'sub-c-8b1086e2-b1dd-11e2-969e-02ee2ddab7fe'
+      subscribe_key : 'sub-c-10526f7d-2df0-11e2-ad5c-29dc07ffb374'
   });
 
   function updateDisplay(pubData) {       
