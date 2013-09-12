@@ -260,12 +260,13 @@ var myApp = (function($) {
     },
     update: function(e) {
       e.preventDefault();
-  
+      self = this;
+      console.log(self.question_id);
       answer_id = $(e.currentTarget).attr('data-id');
       
       StackMob.customcode('pubnub_send', { 
           answer_id: answer_id,
-          question_id: this.question_id
+          question_id: self.question_id
           }, "POST", { 
           success: function(result) { 
               //console.debug(result); 
@@ -302,6 +303,7 @@ var myApp = (function($) {
 
     update: function(e) {
       // LISTEN
+      console.log(e);
       pubnub.subscribe({
           channel : e,
           message : function(pubData){  updateDisplay(pubData); }
